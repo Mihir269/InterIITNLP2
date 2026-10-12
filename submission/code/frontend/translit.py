@@ -28,12 +28,14 @@ HALANT, ANUSVARA = "्", "ं"
 STOPS = set("k kh g ch j T D t d th p f b s sh z".split())  # n before these -> anusvara
 SONORANT_CODA = {"r", "l", "n", "m"}                           # written bare before a consonant
 
-VOWEL_LETTERS = set("aeiou")
+VOWEL_LETTERS = set("aeiouAEIUV")
+# Upper-case markers written by the spelling rewrites in _phonemes: they fix a vowel's value.
+MARKERS = {"A": "aa", "E": "e", "I": "ii", "U": "u", "V": "a"}
 
 
 def _units(w):
     """Split a lowercase word into grapheme units, longest match first."""
-    multi = ["tch", "dge", "igh", "sch", "ch", "sh", "ph", "th", "ck", "wh", "qu", "gh", "ng",
+    multi = ["iew", "tch", "dge", "igh", "sch", "ch", "sh", "ph", "th", "ck", "wh", "qu", "gh", "ng",
              "ee", "ea", "oo", "ou", "ow", "ai", "ay", "oa", "oi", "oy", "au", "aw", "ew", "ue",
              "ie", "ei", "ey"]
     out, i = [], 0
@@ -66,7 +68,20 @@ def _phonemes(word, acronym=False):
     w = re.sub(r"(?<=.)sion", "shan", w)
     w = re.sub(r"(?<=.)ture$", "char", w)    # picture
     w = re.sub(r"(?<=.)ous$", "as", w)
+    w = re.sub(r"ou(?=bl|ch|ntr|ng)", "V", w)  # double, touch, country, young
     w = re.sub(r"(?<=[^aeiou])le$", "al", w)  # table -> tebal
+    w = re.sub(r"(?<=.)[ct]ial", "shal", w)  # special, partial
+    w = re.sub(r"ower", "Aver", w)            # power, flower
+    w = re.sub(r"oo(?=[kdt])", "U", w)        # book, good, foot
+    w = re.sub(r"ea(?=d|th|lth|v)", "E", w)   # ready, weather, health, heavy
+    w = re.sub(r"ou(?=p)", "U", w)            # group
+    w = re.sub(r"(?<=.)th(?=er)", "ð", w)     # weather, mother: voiced th
+    w = re.sub(r"(?<=[aeiouAEIU])s(?=[iy])", "z", w)  # music, busy, easy
+    w = re.sub(r"^ex(?=[aeiou])", "egz", w)    # exam, exact
+    w = re.sub(r"(?<=.)ege$", "Ej", w)        # college
+    if len(w) > 5:
+        w = re.sub(r"^re(?=[bcdfgjklmnpqstvz][aeiou])", "ri", w)  # result, return, repeat
+        w = re.sub(r"^a(?=(cc|pp|tt|nn|ss|dd|ff|ll))", "V", w)  # account, attend: unstressed a
     u = _units(w)
     n = len(u)
     ph = []
@@ -107,7 +122,7 @@ def _phonemes(word, acronym=False):
                 "th": ["th"], "ck": ["k"], "wh": ["v"], "qu": ["k", "v"], "ng": ["n", "g"],
                 "b": ["b"], "d": ["D"], "f": ["f"], "h": ["h"], "j": ["j"], "k": ["k"], "l": ["l"],
                 "m": ["m"], "n": ["n"], "p": ["p"], "q": ["k"], "r": ["r"], "s": ["s"], "t": ["T"],
-                "v": ["v"], "w": ["v"], "x": ["k", "s"], "z": ["z"],
+                "v": ["v"], "w": ["v"], "x": ["k", "s"], "z": ["z"], "ð": ["d"],
             }.get(x)
             if x == "gh":
                 if k == 0:
@@ -135,6 +150,10 @@ def _phonemes(word, acronym=False):
             continue
         # ---------------- vowels ----------------
         ncons, j = cons_run_after(k)
+        if x in MARKERS:
+            ph.append(MARKERS[x])
+            k += 1
+            continue
         final_e_follows = (ncons == 1 and j == n - 1 and u[j] == "e") or \
                           (ncons == 1 and j == n - 2 and u[j] == "e" and u[-1] in ("s", "d"))
         last_syllable = j >= n or (final_e_follows)
@@ -162,7 +181,7 @@ def _phonemes(word, acronym=False):
             v = "Oy"
         elif x in ("au", "aw"):
             v = "O"
-        elif x in ("ew", "ue"):
+        elif x in ("ew", "ue", "iew"):
             v = "yuu"
         elif x == "ie":
             v = "ii" if last or (k + 1 < n and u[k + 1] == "s" and k + 2 == n) else "aai"
@@ -191,7 +210,7 @@ def _phonemes(word, acronym=False):
             unstressed = syll > 2 or (syll == 2 and k > 1 and u[0][0] not in VOWEL_LETTERS and
                                       any(z[0] in VOWEL_LETTERS for z in u[:k]))
             cons_unit = u[k + 1]
-            if unstressed and x == "i" and cons_unit in ("c", "v", "t"):
+            if unstressed and x == "i" and cons_unit in ("c", "v"):
                 v = "i"                           # office, service, active
             elif unstressed and x == "a" and cons_unit in ("g", "t"):
                 v = "e" if cons_unit == "g" else "e"  # message, private
@@ -209,17 +228,19 @@ def _phonemes(word, acronym=False):
                     v = "aa"                      # class, fast, ask
                 elif nxt_c == "l" and nxt(k, 2) in ("l", "") and syll == 1:
                     v = "O"                       # all, call
-                elif closed:
-                    v = "ai"                      # cat, match, cancel
                 elif last:
                     v = "aa"                      # data, sofa (final a)
+                elif closed:
+                    v = "ai"                      # cat, match, cancel
+                elif re.match(r"(er|ion|an|al|a|e|y|ey)$", "".join(u[k + 2:])):
+                    v = "e"                       # paper, station, table, data, lady
                 else:
-                    v = "e"                       # paper, data
-                if j >= n - 1 and syll > 1 and ncons == 1 and nxt_c in ("l", "n", "m"):
+                    v = "ai"                      # family, salary, manager, camera
+                if j >= n and syll > 1 and ncons == 1 and nxt_c in ("l", "n", "m"):
                     v = "a"                       # final, woman: unstressed
             elif x == "e":
                 v = "e"
-                if j >= n - 1 and syll > 1 and ncons == 1 and nxt_c in ("l", "n", "m", "r") and k > 0:
+                if j >= n and syll > 1 and ncons == 1 and nxt_c in ("l", "n", "m", "r") and k > 0:
                     v = "a"                       # hotel, chicken: unstressed
                 if k == 0 and nxt_c == "x":
                     v = "e"
@@ -244,14 +265,15 @@ def _phonemes(word, acronym=False):
                     v = "o"                       # hotel, total
                     if nxt_c == "v" and nxt(k, 2) in ("e", "ie", "i"):
                         v = "uu"                  # move, movie, prove
-                if j >= n - 1 and syll > 1 and ncons == 1 and nxt_c in ("n", "m") and k > 0:
+                if j >= n and syll > 1 and ncons == 1 and nxt_c in ("n", "m") and k > 0:
                     v = "a"
             elif x == "u":
                 if last:
                     v = "uu"
                 elif closed:
                     v = "a"                       # cut, bus, submit
-                    if k > 0 and u[k - 1] in ("p", "b", "f") and nxt_c in ("l", "sh", "t"):
+                    if k > 0 and u[k - 1] in ("p", "b", "f") and nxt_c in ("l", "sh", "t") \
+                            and nxt(k, 2) != nxt_c:
                         v = "u"                   # pull, push, put
                 else:
                     v = "yuu" if k == 0 or u[k - 1] in ("m", "f", "c", "p", "h") else "uu"
@@ -282,7 +304,7 @@ def _render(ph):
             if k > 0 and not is_v[k - 1]:
                 out.append(VOW[p][1])
             elif k > 0 and p == "a":
-                out.append("य")                   # glide: player -> प्लेयर
+                out.append("व" if ph[k - 1] in ("u", "uu") else "य")   # glide: player -> प्लेयर
             else:
                 # vowel after vowel ("aa"+"i" -> आइ) or word-initial vowel
                 out.append(VOW[p][0])
@@ -298,7 +320,10 @@ def _render(ph):
         out.append(CONS[p])
         if nxt is not None and not is_v[k + 1]:
             # consonant cluster: write a halant unless it is a sonorant coda after a vowel
-            bare = prev_v and p in SONORANT_CODA and not (p == "r" and ph[k - 1] != "a")
+            # a sonorant coda is written bare when a new syllable follows (इंटरनेट, ऑनलाइन),
+            # with a halant in a final cluster (कोल्ड); r after a full vowel takes a halant (कार्ड)
+            new_syll = k + 2 < n and is_v[k + 2]
+            bare = prev_v and p in SONORANT_CODA and new_syll and not (p == "r" and ph[k - 1] != "a")
             if not bare:
                 out.append(HALANT)
     s = "".join(out)

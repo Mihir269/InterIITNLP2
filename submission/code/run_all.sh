@@ -42,6 +42,13 @@ if ! skip t3; then
   $MET "$PRED/val_idea" --json "$RES/val_idea.json" --csv "$RES/val_idea.csv"
 fi
 
+# Task 3 ablation: spelling-variant candidates chosen by the recognizer (kept out of predictions/
+# until it beats the plain idea system on validation)
+if ! skip t3v; then
+  python code/synth_idea.py --kit "$KIT" --items "$KIT/data/val_items.csv" --out "$SUB/out/val_idea_variants" --variants 4 --seed $SEED
+  $MET "$SUB/out/val_idea_variants" --json "$RES/val_idea_variants.json" --csv "$RES/val_idea_variants.csv"
+fi
+
 # Task 4: baseline vs fast system timing, same session, same machine
 if ! skip t4; then
   $RB --items "$KIT/data/val_items.csv" --out "$SUB/out/baseline_val"

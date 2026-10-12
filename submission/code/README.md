@@ -9,6 +9,8 @@ pinned IndicF5 baseline. Seed 0 everywhere.
 |---|---|
 | `frontend/normalize.py` | Task 2 `normalize(text)`: Indian-system numbers (लाख, करोड़), ₹ amounts and paise, dd/mm/yyyy dates, years, decimals, %, clock times, abbreviations spelled letter by letter (RBI → आर बी आई), or read as a word when they are pronounceable (4+ letters, 2+ vowels) |
 | `frontend/translit.py` | Task 3 idea: rule-based English → Devanagari letter-to-sound rules for Indian English (grapheme units, open/closed syllables, silent final e, r-coloured vowels, unstressed endings, Hindi spelling conventions). No word list |
+| `synth_idea.py` | Optional Task 3 extension: up to 4 spelling variants per Hinglish item (ऑ/ओ, ऐ/ए swaps), the one the recognizer reads back best is kept (verifier use only), with a 0.03 speaker-similarity guard |
+| `analysis/translit_eval.py`, `analysis/translit_devset.tsv` | Checks the transliteration rules on the validation English words and on a self-written list of 107 common loanwords (no evaluation words) |
 | `make_t2_csv.py` | Writes `predictions/t2_normalized.csv` (64 rows) |
 | `make_texts.py` | Writes the model input for each system: `texts/t2.csv` (Task 2), `texts/idea.csv` (Task 3) |
 | `run_all.sh` | Reproduces every submitted audio folder, the metrics and the timing files (GPU) |
@@ -46,7 +48,9 @@ the decoding settings are exactly the baseline's unless stated (Task 4 uses `--s
 
 - Normalization and transliteration rules were written from the validation items and general
   knowledge of Hindi/English spelling; evaluation text was not used to add or change rules.
-- `predictions/t1_val_errors.csv` was tagged from the metrics transcripts.
+- `predictions/t1_val_errors.csv` was tagged from the metrics transcripts (and must be confirmed by listening).
+- `analysis/translit_devset.tsv` is a self-written list of common English loanwords used only to check
+  that the spelling rules generalize; it contains no evaluation words and no rule looks words up in it.
 
 ## AI coding assistant
 
