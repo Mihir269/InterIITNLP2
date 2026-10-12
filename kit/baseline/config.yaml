@@ -1,0 +1,18 @@
+# Baseline settings. The baseline ALWAYS uses these values; your Task 3/4 system may override
+# any decoding value per call, e.g. synthesize(..., nfe_step=16).
+#
+# TODO(organizers): after the bake-off, replace `revision: main` with the exact commit hash
+# from https://huggingface.co/ai4bharat/IndicF5/commits/main and pin requirements.txt.
+
+repo: ai4bharat/IndicF5
+revision: fb652a96e508091045890dae5bb99fe511facbcf
+length_fix: true          # estimate output length from character counts, not UTF-8 bytes
+model_sample_rate: 24000  # IndicF5 output; the wrapper resamples to 16 kHz
+
+decoding:                 # passed to f5_tts.infer.utils_infer.infer_process
+  nfe_step: 32            # flow-matching steps: fewer is faster and usually worse
+  cfg_strength: 2.0       # classifier-free guidance
+  sway_sampling_coef: -1.0
+  speed: 1.0              # scales the estimated duration (1.0 = as estimated)
+  cross_fade_duration: 0.15   # seconds, when long text is split into chunks
+  target_rms: 0.1

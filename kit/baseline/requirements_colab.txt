@@ -1,0 +1,11 @@
+# Baseline requirements, tested on a free Colab T4 with Python 3.13.
+# numpy is pinned because IndicF5 failed to import with Colab's default numpy.
+# If installing changes numpy, restart the session once (Colab: Runtime > Restart session) and run again.
+numpy>=2.1,<2.3
+transformers
+accelerate
+soundfile
+librosa
+pyyaml
+pandas
+speechbrain>=1.0
