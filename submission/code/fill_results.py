@@ -37,10 +37,10 @@ def main():
         r["task2"] = {"val_cer": c["cer"], "val_sim": c["sim"], "val_cer_hard": c["cer_by_category"]["hard"]}
     i = load(res_dir / "val_idea.json")
     t3 = r["task3"]
-    t3.update({"method_name": "rule-based Indian-English letter-to-sound transliteration (no lexicon)",
+    if i:
+        t3.update({"method_name": "rule-based Indian-English letter-to-sound transliteration (no lexicon)",
                "targeted_failure": "english_word_error", "targeted_category": a.targeted_category,
                "builds_on_task2": True, "settings": {"decoding": "baseline config.yaml", "text": "normalize + translit"}})
-    if i:
         t3.update({"val_cer": i["cer"], "val_sim": i["sim"],
                    "val_cer_targeted": i["cer_by_category"][a.targeted_category],
                    "val_control_cer": c["cer"] if c else None})

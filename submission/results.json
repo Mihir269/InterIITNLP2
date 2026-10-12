@@ -12,14 +12,11 @@
     "val_cer_hard": null
   },
   "task3": {
-    "method_name": "rule-based Indian-English letter-to-sound transliteration (no lexicon)",
-    "targeted_failure": "english_word_error",
-    "targeted_category": "hinglish",
-    "builds_on_task2": true,
-    "settings": {
-      "decoding": "baseline config.yaml",
-      "text": "normalize + translit"
-    },
+    "method_name": "",
+    "targeted_failure": "",
+    "targeted_category": "",
+    "builds_on_task2": false,
+    "settings": {},
     "val_cer": null,
     "val_sim": null,
     "val_cer_targeted": null,
