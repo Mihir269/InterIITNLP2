@@ -1,0 +1,4 @@
+__pycache__/
+*.pyc
+submission/out/
+submission/*_tts_bootcamp.zip

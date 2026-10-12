@@ -1,0 +1,244 @@
+{
+ "text_val": {
+  "hindi": {
+   "words": 17.0,
+   "chars": 65.0,
+   "latin_words": 0.0,
+   "caps_abbrev": 0.0,
+   "digit_groups": 0.0,
+   "rupee": 0.0,
+   "n": 6
+  },
+  "hinglish": {
+   "words": 11.0,
+   "chars": 43.67,
+   "latin_words": 2.83,
+   "caps_abbrev": 0.0,
+   "digit_groups": 0.0,
+   "rupee": 0.0,
+   "n": 6
+  },
+  "hard": {
+   "words": 10.62,
+   "chars": 41.25,
+   "latin_words": 0.38,
+   "caps_abbrev": 0.38,
+   "digit_groups": 1.75,
+   "rupee": 0.62,
+   "n": 8
+  },
+  "long": {
+   "words": 74.25,
+   "chars": 273.25,
+   "latin_words": 0.0,
+   "caps_abbrev": 0.0,
+   "digit_groups": 0.0,
+   "rupee": 0.0,
+   "n": 4
+  }
+ },
+ "text_eval": {
+  "hindi": {
+   "words": 14.3,
+   "chars": 54.0,
+   "latin_words": 0.0,
+   "caps_abbrev": 0.0,
+   "digit_groups": 0.0,
+   "rupee": 0.0,
+   "n": 10
+  },
+  "hinglish": {
+   "words": 11.6,
+   "chars": 44.9,
+   "latin_words": 2.8,
+   "caps_abbrev": 0.0,
+   "digit_groups": 0.0,
+   "rupee": 0.0,
+   "n": 10
+  },
+  "hard": {
+   "words": 12.36,
+   "chars": 45.43,
+   "latin_words": 0.5,
+   "caps_abbrev": 0.5,
+   "digit_groups": 2.14,
+   "rupee": 0.71,
+   "n": 14
+  },
+  "long": {
+   "words": 75.5,
+   "chars": 269.5,
+   "latin_words": 0.0,
+   "caps_abbrev": 0.0,
+   "digit_groups": 0.0,
+   "rupee": 0.0,
+   "n": 6
+  }
+ },
+ "prompts": {
+  "V1": {
+   "dur_s": 9.089,
+   "sr": 24000,
+   "rms": 0.135,
+   "silence_share": 0.253,
+   "lead_sil_s": 0.0,
+   "trail_sil_s": 0.075,
+   "longest_pause_s": 0.775,
+   "peak": 0.891,
+   "chars_per_s": 9.242,
+   "chars_per_voiced_s": 9.319,
+   "gender": "F",
+   "split": "val"
+  },
+  "V2": {
+   "dur_s": 8.452,
+   "sr": 24000,
+   "rms": 0.154,
+   "silence_share": 0.118,
+   "lead_sil_s": 0.0,
+   "trail_sil_s": 0.1,
+   "longest_pause_s": 0.35,
+   "peak": 0.891,
+   "chars_per_s": 9.11,
+   "chars_per_voiced_s": 9.219,
+   "gender": "M",
+   "split": "val"
+  },
+  "V3": {
+   "dur_s": 10.506,
+   "sr": 24000,
+   "rms": 0.17,
+   "silence_share": 0.102,
+   "lead_sil_s": 0.0,
+   "trail_sil_s": 0.0,
+   "longest_pause_s": 0.45,
+   "peak": 0.891,
+   "chars_per_s": 12.564,
+   "chars_per_voiced_s": 12.564,
+   "gender": "F",
+   "split": "val"
+  },
+  "V4": {
+   "dur_s": 11.743,
+   "sr": 24000,
+   "rms": 0.075,
+   "silence_share": 0.252,
+   "lead_sil_s": 0.0,
+   "trail_sil_s": 0.0,
+   "longest_pause_s": 0.85,
+   "peak": 0.891,
+   "chars_per_s": 8.941,
+   "chars_per_voiced_s": 8.941,
+   "gender": "M",
+   "split": "val"
+  },
+  "E1": {
+   "dur_s": 9.951,
+   "sr": 24000,
+   "rms": 0.108,
+   "silence_share": 0.312,
+   "lead_sil_s": 0.0,
+   "trail_sil_s": 0.025,
+   "longest_pause_s": 1.1,
+   "peak": 0.891,
+   "chars_per_s": 8.341,
+   "chars_per_voiced_s": 8.362,
+   "gender": "F",
+   "split": "eval"
+  },
+  "E2": {
+   "dur_s": 8.596,
+   "sr": 24000,
+   "rms": 0.085,
+   "silence_share": 0.391,
+   "lead_sil_s": 0.075,
+   "trail_sil_s": 0.425,
+   "longest_pause_s": 0.9,
+   "peak": 0.891,
+   "chars_per_s": 5.933,
+   "chars_per_voiced_s": 6.299,
+   "gender": "M",
+   "split": "eval"
+  },
+  "E3": {
+   "dur_s": 11.681,
+   "sr": 24000,
+   "rms": 0.153,
+   "silence_share": 0.101,
+   "lead_sil_s": 0.0,
+   "trail_sil_s": 0.0,
+   "longest_pause_s": 0.2,
+   "peak": 0.891,
+   "chars_per_s": 6.335,
+   "chars_per_voiced_s": 6.335,
+   "gender": "F",
+   "split": "eval"
+  },
+  "E4": {
+   "dur_s": 10.815,
+   "sr": 24000,
+   "rms": 0.095,
+   "silence_share": 0.181,
+   "lead_sil_s": 0.175,
+   "trail_sil_s": 0.0,
+   "longest_pause_s": 0.575,
+   "peak": 0.891,
+   "chars_per_s": 8.784,
+   "chars_per_voiced_s": 8.929,
+   "gender": "M",
+   "split": "eval"
+  },
+  "E5": {
+   "dur_s": 8.8,
+   "sr": 24000,
+   "rms": 0.099,
+   "silence_share": 0.247,
+   "lead_sil_s": 0.025,
+   "trail_sil_s": 0.0,
+   "longest_pause_s": 0.525,
+   "peak": 0.891,
+   "chars_per_s": 7.614,
+   "chars_per_voiced_s": 7.635,
+   "gender": "F",
+   "split": "eval"
+  },
+  "E6": {
+   "dur_s": 10.817,
+   "sr": 24000,
+   "rms": 0.078,
+   "silence_share": 0.243,
+   "lead_sil_s": 0.0,
+   "trail_sil_s": 0.0,
+   "longest_pause_s": 0.625,
+   "peak": 0.891,
+   "chars_per_s": 9.43,
+   "chars_per_voiced_s": 9.43,
+   "gender": "M",
+   "split": "eval"
+  }
+ },
+ "corr_rate_cer": 0.722,
+ "corr_inputchars_over_refchars_vs_cer": -0.716,
+ "by_prompt": {
+  "V1": {
+   "cer": 0.2307,
+   "sim": 0.8453,
+   "n": 6
+  },
+  "V2": {
+   "cer": 0.1773,
+   "sim": 0.8459,
+   "n": 6
+  },
+  "V3": {
+   "cer": 0.3044,
+   "sim": 0.8561,
+   "n": 6
+  },
+  "V4": {
+   "cer": 0.2577,
+   "sim": 0.7737,
+   "n": 6
+  }
+ }
+}

@@ -1,0 +1,33 @@
+{
+  "roll_no": "",
+  "machine": "e.g. Colab T4",
+  "seed": 0,
+  "task1": {
+    "val_cer": 0.2426,
+    "val_sim": 0.8303
+  },
+  "task2": {
+    "val_cer": null,
+    "val_sim": null,
+    "val_cer_hard": null
+  },
+  "task3": {
+    "method_name": "",
+    "targeted_failure": "",
+    "targeted_category": "",
+    "builds_on_task2": false,
+    "settings": {},
+    "val_cer": null,
+    "val_sim": null,
+    "val_cer_targeted": null,
+    "val_control_cer": null
+  },
+  "task4": {
+    "method_name": "",
+    "settings": {},
+    "val_cer": null,
+    "baseline_seconds": null,
+    "fast_seconds": null,
+    "speedup": null
+  }
+}
