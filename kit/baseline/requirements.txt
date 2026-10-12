@@ -1,7 +1,7 @@
 # Baseline requirements, tested on a free Colab T4 with Python 3.13.
 # numpy is pinned because IndicF5 failed to import with Colab's default numpy.
 # If installing changes numpy, restart the session once (Colab: Runtime > Restart session) and run again.
-git+https://github.com/ai4bharat/IndicF5.git@fb652a96e508091045890dae5bb99fe511facbcf
+git+https://github.com/ai4bharat/IndicF5.git@13f7c4d627cc10111aea8fe9c0039462cacacdc7
 numpy>=2.1,<2.3
 transformers==4.49.0
 accelerate==1.15.0
