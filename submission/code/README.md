@@ -11,6 +11,10 @@ pinned IndicF5 baseline. Seed 0 everywhere.
 | `frontend/translit.py` | Task 3 idea: rule-based English → Devanagari letter-to-sound rules for Indian English (grapheme units, open/closed syllables, silent final e, r-coloured vowels, unstressed endings, Hindi spelling conventions). No word list |
 | `synth_idea.py` | Optional Task 3 extension: up to 4 spelling variants per Hinglish item (ऑ/ओ, ऐ/ए swaps), the one the recognizer reads back best is kept (verifier use only), with a 0.03 speaker-similarity guard |
 | `analysis/translit_eval.py`, `analysis/translit_devset.tsv` | Checks the transliteration rules on the validation English words and on a self-written list of 107 common loanwords (no evaluation words) |
+| `frontend/syllables.py` | Rule-based Devanagari syllable counter; `speed_for()` turns IndicF5's character-based length into a syllable-based one through the allowed `speed` setting |
+| `prep_prompts.py` | Shortens pauses longer than 0.25 s inside the reference clips to 0.15 s (allowed trimming; transcript unchanged) |
+| `synth_system.py` | Synthesizes and times any configuration: text CSV, `--syllable-speed`, `--prompts`, `--keep-pace`, decoding overrides |
+| `run_experiments.sh`, `experiments.ipynb` | Validation-only grid for Task 3/Task 4 ideas; `analysis/compare.py` prints the table and per-item changes |
 | `make_t2_csv.py` | Writes `predictions/t2_normalized.csv` (64 rows) |
 | `make_texts.py` | Writes the model input for each system: `texts/t2.csv` (Task 2), `texts/idea.csv` (Task 3) |
 | `run_all.sh` | Reproduces every submitted audio folder, the metrics and the timing files (GPU) |

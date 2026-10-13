@@ -2,3 +2,4 @@ __pycache__/
 *.pyc
 submission/out/
 submission/*_tts_bootcamp.zip
+submission/code/prompts_trim/
