@@ -38,16 +38,17 @@ def main():
     i = load(res_dir / "val_idea.json")
     t3 = r["task3"]
     if i:
-        t3.update({"method_name": "rule-based Indian-English letter-to-sound transliteration (no lexicon)",
+        t3.update({"method_name": "rule-based Indian-English letter-to-sound transliteration + syllable-based length for English-containing sentences",
                "targeted_failure": "english_word_error", "targeted_category": a.targeted_category,
-               "builds_on_task2": True, "settings": {"decoding": "baseline config.yaml", "text": "normalize + translit"}})
+               "builds_on_task2": True, "settings": {"decoding": "baseline config.yaml (nfe_step 32)", "text": "normalize + translit",
+                                "speed": "per item: chars/syllables ratio vs prompt, clamped 0.8-1.25, only if the text has English words"}})
         t3.update({"val_cer": i["cer"], "val_sim": i["sim"],
                    "val_cer_targeted": i["cer_by_category"][a.targeted_category],
                    "val_control_cer": c["cer"] if c else None})
     f = load(res_dir / "val_fast.json")
     bt, ft = load(HERE / "baseline_val_timing.json"), load(HERE / "val_fast_timing.json")
     if f and bt and ft:
-        r["task4"] = {"method_name": "Task 3 system with fewer flow-matching steps",
+        r["task4"] = {"method_name": "Task 3 system with 12 flow-matching steps",
                       "settings": ft.get("overrides", {}), "val_cer": f["cer"],
                       "baseline_seconds": bt["total_synth_s"], "fast_seconds": ft["total_synth_s"],
                       "speedup": round(bt["total_synth_s"] / ft["total_synth_s"], 3)}

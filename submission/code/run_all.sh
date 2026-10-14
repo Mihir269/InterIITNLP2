@@ -10,7 +10,7 @@ SUB="$(pwd)"
 KIT="${KIT:-$SUB/../kit}"
 SEED="${SEED:-0}"
 SKIP="${SKIP:-}"
-FAST_SET="${FAST_SET:-nfe_step=16}"
+FAST_SET="${FAST_SET:-nfe_step=12}"
 PRED="$SUB/predictions"
 RES="$SUB/code/results"
 mkdir -p "$PRED" "$RES" "$SUB/out"
@@ -35,25 +35,22 @@ if ! skip t2; then
   $MET "$PRED/val_control" --json "$RES/val_control.json" --csv "$RES/val_control.csv"
 fi
 
-# Task 3: the idea (Task 2 text + rule-based transliteration of English words)
+# Task 3: the idea = Task 2 text + rule-based transliteration of English words + syllable-based
+# output length (through `speed`) for sentences that contain English words
+IDEA_OPTS="--text-csv code/texts/idea.csv --syllable-speed --syllable-scope english"
+SYN="python code/synth_system.py --kit $KIT --seed $SEED"
 if ! skip t3; then
-  $RB --items "$KIT/data/val_items.csv"  --out "$PRED/val_idea" --text-csv code/texts/idea.csv
-  $RB --items "$KIT/data/eval_items.csv" --out "$PRED/t3_idea"  --text-csv code/texts/idea.csv
+  $SYN --items "$KIT/data/val_items.csv"  --out "$PRED/val_idea" $IDEA_OPTS
+  $SYN --items "$KIT/data/eval_items.csv" --out "$PRED/t3_idea"  $IDEA_OPTS
   $MET "$PRED/val_idea" --json "$RES/val_idea.json" --csv "$RES/val_idea.csv"
 fi
 
-# Task 3 ablation: spelling-variant candidates chosen by the recognizer (kept out of predictions/
-# until it beats the plain idea system on validation)
-if ! skip t3v; then
-  python code/synth_idea.py --kit "$KIT" --items "$KIT/data/val_items.csv" --out "$SUB/out/val_idea_variants" --variants 4 --seed $SEED
-  $MET "$SUB/out/val_idea_variants" --json "$RES/val_idea_variants.json" --csv "$RES/val_idea_variants.csv"
-fi
-
-# Task 4: baseline vs fast system timing, same session, same machine
+# Task 4: the Task 3 system with 12 flow-matching steps. Baseline and fast system timed in the
+# same session on the same machine (model loaded, one warm-up excluded).
 if ! skip t4; then
-  $RB --items "$KIT/data/val_items.csv" --out "$SUB/out/baseline_val"
-  $RB --items "$KIT/data/val_items.csv" --out "$SUB/out/val_fast" --text-csv code/texts/idea.csv --set $FAST_SET
-  $RB --items "$KIT/data/eval_items.csv" --out "$PRED/t4_fast" --text-csv code/texts/idea.csv --set $FAST_SET
+  $RB  --items "$KIT/data/val_items.csv" --out "$SUB/out/baseline_val"
+  $SYN --items "$KIT/data/val_items.csv" --out "$SUB/out/val_fast" $IDEA_OPTS --set $FAST_SET
+  $SYN --items "$KIT/data/eval_items.csv" --out "$PRED/t4_fast" $IDEA_OPTS --set $FAST_SET
   $MET "$SUB/out/val_fast" --json "$RES/val_fast.json" --csv "$RES/val_fast.csv"
   cp "$SUB/out/baseline_val_timing.json" "$SUB/out/val_fast_timing.json" code/   # Task 4 needs both in code/
 fi

@@ -45,8 +45,13 @@ python code/make_zip.py --roll <ROLLNO>
 python ../kit/check_format.py <ROLLNO>_tts_bootcamp.zip
 ```
 
-`run_all.sh` calls the kit's own `baseline/run_baseline.py` with `--text-csv` for every system, so
-the decoding settings are exactly the baseline's unless stated (Task 4 uses `--set nfe_step=16`).
+`run_all.sh` uses the kit's own `baseline/run_baseline.py` for the baseline and Task 2 audio, and
+`synth_system.py` (same engine, same timing method) for Task 3 and Task 4:
+
+- Task 3: `--text-csv code/texts/idea.csv --syllable-speed --syllable-scope english` (baseline decoding)
+- Task 4: the same plus `--set nfe_step=12`
+
+The choice of these settings was made on validation only (`code/results/exp_round2/`, seeds 0-2).
 
 ## Rules compliance
 

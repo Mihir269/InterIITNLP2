@@ -36,3 +36,17 @@ Transliteration rules: validation words 82% exact (CER 0.034); self-written 107-
 
 ## Still to fill after the GPU run
 Task 2 val_control CER/SIM, Task 3 val_idea CER/SIM and per-item gains/losses (Q1), Task 4 timing.
+
+
+## Experiments after the first run (validation only; facts for idea.md part 4 and report.md)
+Round 1 (seed 0): syllable-based length for every item: Hinglish 0.047 -> 0.026 but Hindi 0.034 -> 0.046 and
+long 0.032 -> 0.060. Pause-compressed prompts: SIM up (0.841 -> 0.850) but CER worse. 8 steps / no CFG fail.
+Round 2: syllable-based length only for sentences with English words (decided from the input text):
+- seed 0: Hinglish 0.0467 -> 0.0257, other categories identical, overall 0.0585 -> 0.0532
+- seed 1: 0.0254 -> 0.0254;  seed 2: 0.0303 -> 0.0291  (never worse; mean 0.034 -> 0.027)
+- seed-to-seed spread of the plain idea system (0.025-0.047) is as large as the effect.
+Task 4: 12 steps on the final Task 3 system: CER 0.0530 (= Task 3), 2.42x faster; 10 steps 0.0669 (> 1.2x limit).
+
+Final Task 3 vs baseline per item (seed 0): no item worse; Hindi/long unchanged (not touched).
+Largest gains: val_hd_08 0.603->0.064, val_hd_01 0.587->0.127, val_hg_01 0.452->0.032.
+Smallest Hinglish gains: val_hg_02 0.216->0.054 ("address" -> अड्रेस), val_hg_04 0.263->0.026.
