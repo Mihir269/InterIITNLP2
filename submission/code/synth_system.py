@@ -7,6 +7,8 @@ Options (each is an allowed change: model input text, reference clip, decoding s
   --text-csv           model input text per item (texts/t2.csv or texts/idea.csv)
   --syllable-speed     per-item `speed` so the output length follows syllable counts instead of
                        character counts (frontend/syllables.py)
+  --syllable-scope     all | english: only for items whose original text has an English word
+                       (a Latin-script word with a lower-case letter; ALL-CAPS abbreviations do not count)
   --prompts            alternative prompts.csv, e.g. pause-compressed clips from prep_prompts.py
   --keep-pace          with a shortened prompt, rescale `speed` so outputs keep the original
                        clip's pace (saves compute without speaking faster)
@@ -15,12 +17,17 @@ Options (each is an allowed change: model input text, reference clip, decoding s
     python code/synth_system.py --items ../kit/data/val_items.csv --out out/exp_syl \
         --text-csv code/texts/idea.csv --syllable-speed
 """
-import argparse, csv, json, platform, sys, time
+import argparse, csv, json, platform, re, sys, time
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE / "frontend"))
 from syllables import speed_for  # noqa: E402
+
+
+def has_english(text):
+    """True if the text has an English word in Latin script (not just an ALL-CAPS abbreviation)."""
+    return any(re.search(r"[a-z]", w) for w in re.findall(r"[A-Za-z]+", text))
 
 
 def read_csv(p):
@@ -46,6 +53,8 @@ def main():
     ap.add_argument("--text-column", default="normalized_text")
     ap.add_argument("--prompts", default=None, help="prompts.csv (default: the kit's)")
     ap.add_argument("--syllable-speed", action="store_true")
+    ap.add_argument("--syllable-scope", choices=["all", "english"], default="all")
+    ap.add_argument("--ids", help="comma-separated subset of item ids")
     ap.add_argument("--keep-pace", action="store_true")
     ap.add_argument("--speed-range", default="0.8,1.25")
     ap.add_argument("--seed", type=int, default=0)
@@ -57,6 +66,11 @@ def main():
     import torch
 
     items = read_csv(a.items)
+    if a.ids:
+        keep = set(a.ids.split(","))
+        items = [it for it in items if it["id"] in keep]
+    for it in items:
+        it["orig_text"] = it["text"]
     if a.text_csv:
         repl = {r["id"]: r[a.text_column] for r in read_csv(a.text_csv)}
         for it in items:
@@ -70,7 +84,7 @@ def main():
     def item_overrides(it):
         p = prompts[it["prompt_id"]]
         sp = base.get("speed", 1.0)
-        if a.syllable_speed:
+        if a.syllable_speed and (a.syllable_scope == "all" or has_english(it["orig_text"])):
             sp *= speed_for(it["text"], p["transcript"], lo, hi)
         if a.keep_pace:
             sp *= float(p["duration_s"]) / float(orig[it["prompt_id"]]["duration_s"])
@@ -103,7 +117,7 @@ def main():
 
     gpu = torch.cuda.get_device_name(0) if torch.cuda.is_available() else "cpu"
     timing = {"total_synth_s": round(total, 3), "n_items": len(items), "model_load_s": round(load_s, 1),
-              "seed": a.seed, "overrides": base, "syllable_speed": a.syllable_speed, "keep_pace": a.keep_pace,
+              "seed": a.seed, "overrides": base, "syllable_speed": a.syllable_speed, "syllable_scope": a.syllable_scope, "keep_pace": a.keep_pace,
               "prompts": str(pcsv), "text_csv": a.text_csv, "gpu": gpu, "python": platform.python_version(),
               "items_file": str(a.items), "per_item_s": per_item, "per_item_speed": speeds}
     tpath = out.parent / f"{out.name}_timing.json"

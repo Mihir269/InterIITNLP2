@@ -12,8 +12,8 @@ VAL="$KIT/data/val_items.csv"; IDEA="code/texts/idea.csv"; TRIM="code/prompts_tr
 python code/make_texts.py --kit "$KIT" --out code/texts >/dev/null
 python code/prep_prompts.py --kit "$KIT" --out code/prompts_trim
 
-score() {  # name
-  [ -f "$RES/$1.json" ] || python "$KIT/metrics.py" "$OUT/$1" --items "$VAL" --prompts "$KIT/data/prompts.csv" \
+score() {  # name   (env ITEMS: items csv, default all validation items)
+  [ -f "$RES/$1.json" ] || python "$KIT/metrics.py" "$OUT/$1" --items "${ITEMS:-$VAL}" --prompts "$KIT/data/prompts.csv" \
       --json "$RES/$1.json" --csv "$RES/$1.csv" > "$RES/$1.log" 2>&1
   cp -f "$OUT/$1_timing.json" "$RES/" 2>/dev/null || true
   python -c "import json;d=json.load(open('$RES/$1.json'));print('$1', 'CER', d['cer'], 'SIM', d['sim'], d['cer_by_category'])"
@@ -22,7 +22,7 @@ run() {  # name, args...
   local name=$1; shift
   if [ ! -f "$OUT/${name}_timing.json" ]; then
     echo "=== $name: $*"
-    python code/synth_system.py --kit "$KIT" --items "$VAL" --out "$OUT/$name" --seed 0 "$@" || { echo "FAILED $name"; return; }
+    python code/synth_system.py --kit "$KIT" --items "${ITEMS:-$VAL}" --out "$OUT/$name" --seed "${SEED:-0}" "$@" || { echo "FAILED $name"; return; }
   fi
   score "$name"
 }
@@ -45,5 +45,21 @@ if [[ " $PHASES " == *" t4 "* ]]; then
   run fast8           --text-csv $IDEA --set nfe_step=8
   run fast12_trim     --text-csv $IDEA --prompts $TRIM --keep-pace --set nfe_step=12
   run fast16_nocfg    --text-csv $IDEA --set nfe_step=16 cfg_strength=0
+fi
+if [[ " $PHASES " == *" t3b "* ]]; then
+  # syllable-based length only where the sentence has English words
+  run idea_sylE       --text-csv $IDEA --syllable-speed --syllable-scope english
+  # robustness: a second seed on the 6 Hinglish items (scored on those items only)
+  HG="$OUT/hinglish_items.csv"
+  python -c "import csv,sys;r=list(csv.DictReader(open('$VAL',encoding='utf-8')));w=csv.DictWriter(open('$HG','w',encoding='utf-8',newline=''),fieldnames=list(r[0]));w.writeheader();w.writerows(x for x in r if x['category']=='hinglish')"
+  ITEMS=$HG SEED=1 run s1hg_idea     --text-csv $IDEA
+  ITEMS=$HG SEED=1 run s1hg_idea_syl --text-csv $IDEA --syllable-speed
+  ITEMS=$HG SEED=2 run s2hg_idea     --text-csv $IDEA
+  ITEMS=$HG SEED=2 run s2hg_idea_syl --text-csv $IDEA --syllable-speed
+fi
+if [[ " $PHASES " == *" t4b "* ]]; then
+  run fast10          --text-csv $IDEA --set nfe_step=10
+  run fast12_sylE     --text-csv $IDEA --syllable-speed --syllable-scope english --set nfe_step=12
+  run fast10_sylE     --text-csv $IDEA --syllable-speed --syllable-scope english --set nfe_step=10
 fi
 python code/analysis/compare.py --res "$RES" --ref idea --base base
