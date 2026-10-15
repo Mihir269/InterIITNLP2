@@ -63,3 +63,33 @@ def speed_for(gen_text: str, ref_text: str, lo=0.8, hi=1.25) -> float:
         return 1.0
     sp = (chars(gen_text) / chars(ref_text)) / (s_gen / s_ref)
     return float(min(hi, max(lo, sp)))
+
+
+PAUSE_MARKS = re.compile(r"[,।?!.;:](?=\s*\S)")   # punctuation followed by more text (not the final mark)
+
+
+def pauses(text: str) -> int:
+    """Number of sentence-internal punctuation marks, i.e. places where a speaker pauses."""
+    return len(PAUSE_MARKS.findall(text))
+
+
+def pause_speed(gen_text: str, ref_text: str, k_syl: float, syllable_based: bool,
+                lo=0.8, hi=1.25) -> float:
+    """`speed` that adds a pause allowance of k_syl syllables per internal punctuation mark.
+
+    The prompt transcripts have no punctuation, so the prompt's rate already includes its average
+    pausing; this gives extra time only where the new text marks a pause. Lengths are expressed in
+    'prompt characters' so it works on top of either the character-based (default) or the
+    syllable-based length.
+    """
+    c_gen, c_ref = chars(gen_text), chars(ref_text)
+    s_gen, s_ref = syllables(gen_text), syllables(ref_text)
+    if not c_gen or not s_ref:
+        return 1.0
+    chars_per_syl = c_ref / s_ref
+    if syllable_based:
+        units = min(c_gen / lo, max(c_gen / hi, s_gen * chars_per_syl))   # same clamp as speed_for
+    else:
+        units = c_gen
+    units += k_syl * pauses(gen_text) * chars_per_syl
+    return float(c_gen / units)

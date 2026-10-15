@@ -28,7 +28,7 @@ run() {  # name, args...
 }
 
 # Reference points, same session: the baseline itself (for the Task 4 speed-up) and the current idea
-if [[ "$PHASES" != "t2c" && "$PHASES" != cfg* ]]; then
+if [[ "$PHASES" != "t2c" && "$PHASES" != *cfg* && "$PHASES" != *pause* ]]; then
 # the baseline via the kit's own runner (its timing file is the Task 4 reference)
 [ -f "$OUT/base_timing.json" ] || python "$KIT/baseline/run_baseline.py" --items "$VAL" --prompts "$KIT/data/prompts.csv" --out "$OUT/base" --seed 0
 score base
@@ -74,20 +74,25 @@ if [[ " $PHASES " == *" t2c "* ]]; then
   done
 fi
 FINAL="--text-csv $IDEA --syllable-speed --syllable-scope english"   # the submitted Task 3 system
+# reference for rounds 4-5: the submitted Task 3 system (cfg 2.0, no pause allowance), seed 0.
+# It is deterministic and already measured (round 2, idea_sylE), so it is copied, not re-run.
+cp code/results/exp_round2/idea_sylE.json "$RES/final.json"; cp code/results/exp_round2/idea_sylE.csv "$RES/final.csv"
+if [[ " $PHASES " == *" pause "* ]]; then
+  # pause allowance: k extra syllables of time per sentence-internal punctuation mark
+  run pause1 $FINAL --pause-syl 1
+  run pause2 $FINAL --pause-syl 2
+fi
 if [[ " $PHASES " == *" cfg "* ]]; then
-  # cfg_strength around the default 2.0, on the final Task 3 system, all 24 items, seed 0.
-  # The cfg 2.0 reference is deterministic and already measured (round 2, idea_sylE): copy it.
-  cp code/results/exp_round2/idea_sylE.json "$RES/cfg20.json"; cp code/results/exp_round2/idea_sylE.csv "$RES/cfg20.csv"
+  # cfg_strength around the default 2.0, on the final Task 3 system, all 24 items, seed 0
   run cfg15  $FINAL --set cfg_strength=1.5
   run cfg25  $FINAL --set cfg_strength=2.5
   run cfg30  $FINAL --set cfg_strength=3.0
-  python code/analysis/compare.py --res "$RES" --ref cfg20 --base base
 fi
 if [[ " $PHASES " == *" cfg_seeds "* ]]; then
   # robustness of the best value (set CFGBEST, e.g. 2.5) against 2.0 on seeds 1 and 2
   for S in 1 2; do
-    SEED=$S run s${S}_cfg20 $FINAL
+    SEED=$S run s${S}_final $FINAL
     SEED=$S run s${S}_cfg${CFGBEST/./} $FINAL --set cfg_strength=$CFGBEST
   done
 fi
-python code/analysis/compare.py --res "$RES" --ref idea --base base
+python code/analysis/compare.py --res "$RES" --ref final --base base

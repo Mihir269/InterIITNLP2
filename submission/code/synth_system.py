@@ -22,7 +22,7 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE / "frontend"))
-from syllables import chars, speed_for  # noqa: E402
+from syllables import chars, pause_speed, speed_for  # noqa: E402
 
 
 def has_english(text):
@@ -56,6 +56,8 @@ def main():
     ap.add_argument("--syllable-scope", choices=["all", "english"], default="all")
     ap.add_argument("--ids", help="comma-separated subset of item ids")
     ap.add_argument("--min-rate", type=float, default=5.0, help="chars/s floor when slowing an item down")
+    ap.add_argument("--pause-syl", type=float, default=0.0,
+                    help="extra time per sentence-internal punctuation mark, in syllables of the prompt's pace")
     ap.add_argument("--keep-pace", action="store_true")
     ap.add_argument("--speed-range", default="0.8,1.25")
     ap.add_argument("--seed", type=int, default=0)
@@ -85,8 +87,15 @@ def main():
     def item_overrides(it):
         p = prompts[it["prompt_id"]]
         sp = base.get("speed", 1.0)
-        if a.syllable_speed and (a.syllable_scope == "all" or has_english(it["orig_text"])):
+        use_syl = a.syllable_speed and (a.syllable_scope == "all" or has_english(it["orig_text"]))
+        if a.pause_syl > 0:
+            # syllable length (if it applies) plus a pause allowance per internal punctuation mark
+            f = pause_speed(it["text"], p["transcript"], a.pause_syl, use_syl, lo, hi)
+        elif use_syl:
             f = speed_for(it["text"], p["transcript"], lo, hi)
+        else:
+            f = 1.0
+        if f != 1.0:
             if f < 1.0:
                 # never slow an item below --min-rate chars/s (the scorer fails items under 4 chars/s);
                 # IndicF5's own length is clip_seconds * chars(text) / chars(transcript)
@@ -124,7 +133,7 @@ def main():
 
     gpu = torch.cuda.get_device_name(0) if torch.cuda.is_available() else "cpu"
     timing = {"total_synth_s": round(total, 3), "n_items": len(items), "model_load_s": round(load_s, 1),
-              "seed": a.seed, "overrides": base, "syllable_speed": a.syllable_speed, "syllable_scope": a.syllable_scope, "keep_pace": a.keep_pace,
+              "seed": a.seed, "overrides": base, "syllable_speed": a.syllable_speed, "syllable_scope": a.syllable_scope, "pause_syl": a.pause_syl, "keep_pace": a.keep_pace,
               "prompts": str(pcsv), "text_csv": a.text_csv, "gpu": gpu, "python": platform.python_version(),
               "items_file": str(a.items), "per_item_s": per_item, "per_item_speed": speeds}
     tpath = out.parent / f"{out.name}_timing.json"
