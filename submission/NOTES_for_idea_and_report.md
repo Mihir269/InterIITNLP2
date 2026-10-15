@@ -58,3 +58,11 @@ better, RBI worse or equal, GST mixed. Not adopted.
 Vocabulary check (IndicF5 checkpoints/vocab.txt): 2546 tokens; all 52 Latin letters (A-Z, a-z) are present,
 104 Devanagari characters. So Latin script is *in the vocabulary* but under-trained: the training transcripts
 write English loanwords in Devanagari, so the model rarely learned how Latin letters sound.
+
+Round 4 (validation, final Task 3 system, seed 0): cfg_strength
+- 1.5: CER 0.0528 (vs 0.0532 at 2.0) – same within noise; SIM 0.837 (slightly lower)
+- 2.5: CER 0.0686 – val_lg_03 jumps 0.052 -> 0.348 (long item breaks down)
+- 3.0: CER 0.1346, SIM 0.760, 2 items FAIL the clipping check (val_hg_01, val_hg_04: words right, but
+  over-guidance makes the audio so loud it clips) -> counted as CER 1
+Kept 2.0. Lesson: stronger guidance does not mean clearer speech; past ~2 it overshoots into
+distortion/clipping and instability on long items.
