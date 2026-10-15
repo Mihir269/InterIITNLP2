@@ -1,33 +1,39 @@
 {
-  "roll_no": "",
-  "machine": "e.g. Colab T4",
+  "roll_no": "24b2443",
+  "machine": "Colab T4",
   "seed": 0,
   "task1": {
-    "val_cer": 0.2426,
+    "val_cer": 0.2421,
     "val_sim": 0.8303
   },
   "task2": {
-    "val_cer": null,
-    "val_sim": null,
-    "val_cer_hard": null
+    "val_cer": 0.1223,
+    "val_sim": 0.8371,
+    "val_cer_hard": 0.0989
   },
   "task3": {
-    "method_name": "",
-    "targeted_failure": "",
-    "targeted_category": "",
-    "builds_on_task2": false,
-    "settings": {},
-    "val_cer": null,
-    "val_sim": null,
-    "val_cer_targeted": null,
-    "val_control_cer": null
+    "method_name": "rule-based Indian-English letter-to-sound transliteration + syllable-based length for English-containing sentences",
+    "targeted_failure": "english_word_error",
+    "targeted_category": "hinglish",
+    "builds_on_task2": true,
+    "settings": {
+      "decoding": "baseline config.yaml (nfe_step 32)",
+      "text": "normalize + translit",
+      "speed": "per item: chars/syllables ratio vs prompt, clamped 0.8-1.25, only if the text has English words"
+    },
+    "val_cer": 0.0532,
+    "val_sim": 0.8407,
+    "val_cer_targeted": 0.0257,
+    "val_control_cer": 0.1223
   },
   "task4": {
-    "method_name": "",
-    "settings": {},
-    "val_cer": null,
-    "baseline_seconds": null,
-    "fast_seconds": null,
-    "speedup": null
+    "method_name": "Task 3 system with 12 flow-matching steps",
+    "settings": {
+      "nfe_step": 12
+    },
+    "val_cer": 0.053,
+    "baseline_seconds": 616.955,
+    "fast_seconds": 245.632,
+    "speedup": 2.512
   }
 }
