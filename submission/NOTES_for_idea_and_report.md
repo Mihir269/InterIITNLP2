@@ -54,3 +54,7 @@ Smallest Hinglish gains: val_hg_02 0.216->0.054 ("address" -> अड्रेस
 Round 3 (validation hard items, seeds 0-2): commas between spelled letters (ए, टी, एम):
 hard CER 0.099/0.101/0.114 -> 0.107/0.102/0.101 (mean 0.105 -> 0.103, within seed noise). ATM always
 better, RBI worse or equal, GST mixed. Not adopted.
+
+Vocabulary check (IndicF5 checkpoints/vocab.txt): 2546 tokens; all 52 Latin letters (A-Z, a-z) are present,
+104 Devanagari characters. So Latin script is *in the vocabulary* but under-trained: the training transcripts
+write English loanwords in Devanagari, so the model rarely learned how Latin letters sound.

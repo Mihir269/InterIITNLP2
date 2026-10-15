@@ -49,6 +49,8 @@ IndicF5 is F5-TTS fine-tuned on ~1,400 hours of Indian-language speech.
   explains a lot of our findings. `speed` is a setting we are allowed to change per item.
 - Its text vocabulary is characters. It was trained on Indian speech whose transcripts write
   English loanwords **in Devanagari** (ऑफिस, मार्केट). Latin letters are rare in its training text.
+  (Checked: `vocab.txt` has 2,546 tokens and does contain all 52 Latin letters, so Latin is
+  *known but under-trained*, not missing.)
 
 ### 1.3 How the outputs are scored
 - **CER (character error rate)**: a speech recognizer (ASR) transcribes the audio; CER = number of
