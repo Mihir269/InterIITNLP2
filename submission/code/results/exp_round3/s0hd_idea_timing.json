@@ -1,0 +1,35 @@
+{
+ "total_synth_s": 162.691,
+ "n_items": 8,
+ "model_load_s": 12.6,
+ "seed": 0,
+ "overrides": {},
+ "syllable_speed": false,
+ "syllable_scope": "all",
+ "keep_pace": false,
+ "prompts": "/content/InterIITNLP2/kit/data/prompts.csv",
+ "text_csv": "code/texts/idea.csv",
+ "gpu": "Tesla T4",
+ "python": "3.13.15",
+ "items_file": "/content/InterIITNLP2/submission/out/exp/hard_items.csv",
+ "per_item_s": {
+  "val_hd_01": 17.249,
+  "val_hd_02": 16.141,
+  "val_hd_03": 16.792,
+  "val_hd_04": 24.056,
+  "val_hd_05": 19.561,
+  "val_hd_06": 21.348,
+  "val_hd_07": 17.764,
+  "val_hd_08": 29.779
+ },
+ "per_item_speed": {
+  "val_hd_01": 1.0,
+  "val_hd_02": 1.0,
+  "val_hd_03": 1.0,
+  "val_hd_04": 1.0,
+  "val_hd_05": 1.0,
+  "val_hd_06": 1.0,
+  "val_hd_07": 1.0,
+  "val_hd_08": 1.0
+ }
+}

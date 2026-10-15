@@ -50,3 +50,7 @@ Task 4: 12 steps on the final Task 3 system: CER 0.0530 (= Task 3), 2.42x faster
 Final Task 3 vs baseline per item (seed 0): no item worse; Hindi/long unchanged (not touched).
 Largest gains: val_hd_08 0.603->0.064, val_hd_01 0.587->0.127, val_hg_01 0.452->0.032.
 Smallest Hinglish gains: val_hg_02 0.216->0.054 ("address" -> अड्रेस), val_hg_04 0.263->0.026.
+
+Round 3 (validation hard items, seeds 0-2): commas between spelled letters (ए, टी, एम):
+hard CER 0.099/0.101/0.114 -> 0.107/0.102/0.101 (mean 0.105 -> 0.103, within seed noise). ATM always
+better, RBI worse or equal, GST mixed. Not adopted.
