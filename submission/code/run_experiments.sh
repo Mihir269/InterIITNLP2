@@ -28,7 +28,7 @@ run() {  # name, args...
 }
 
 # Reference points, same session: the baseline itself (for the Task 4 speed-up) and the current idea
-if [[ "$PHASES" != "t2c" ]]; then
+if [[ "$PHASES" != "t2c" && "$PHASES" != cfg* ]]; then
 # the baseline via the kit's own runner (its timing file is the Task 4 reference)
 [ -f "$OUT/base_timing.json" ] || python "$KIT/baseline/run_baseline.py" --items "$VAL" --prompts "$KIT/data/prompts.csv" --out "$OUT/base" --seed 0
 score base
@@ -71,6 +71,23 @@ if [[ " $PHASES " == *" t2c "* ]]; then
   for S in 0 1 2; do
     ITEMS=$HD SEED=$S run s${S}hd_idea  --text-csv $IDEA
     ITEMS=$HD SEED=$S run s${S}hd_abbr  --text-csv code/texts/idea_abbrcomma.csv
+  done
+fi
+FINAL="--text-csv $IDEA --syllable-speed --syllable-scope english"   # the submitted Task 3 system
+if [[ " $PHASES " == *" cfg "* ]]; then
+  # cfg_strength around the default 2.0, on the final Task 3 system, all 24 items, seed 0.
+  # The cfg 2.0 reference is deterministic and already measured (round 2, idea_sylE): copy it.
+  cp code/results/exp_round2/idea_sylE.json "$RES/cfg20.json"; cp code/results/exp_round2/idea_sylE.csv "$RES/cfg20.csv"
+  run cfg15  $FINAL --set cfg_strength=1.5
+  run cfg25  $FINAL --set cfg_strength=2.5
+  run cfg30  $FINAL --set cfg_strength=3.0
+  python code/analysis/compare.py --res "$RES" --ref cfg20 --base base
+fi
+if [[ " $PHASES " == *" cfg_seeds "* ]]; then
+  # robustness of the best value (set CFGBEST, e.g. 2.5) against 2.0 on seeds 1 and 2
+  for S in 1 2; do
+    SEED=$S run s${S}_cfg20 $FINAL
+    SEED=$S run s${S}_cfg${CFGBEST/./} $FINAL --set cfg_strength=$CFGBEST
   done
 fi
 python code/analysis/compare.py --res "$RES" --ref idea --base base
