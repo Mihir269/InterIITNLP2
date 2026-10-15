@@ -28,10 +28,12 @@ run() {  # name, args...
 }
 
 # Reference points, same session: the baseline itself (for the Task 4 speed-up) and the current idea
+if [[ "$PHASES" != "t2c" ]]; then
 # the baseline via the kit's own runner (its timing file is the Task 4 reference)
 [ -f "$OUT/base_timing.json" ] || python "$KIT/baseline/run_baseline.py" --items "$VAL" --prompts "$KIT/data/prompts.csv" --out "$OUT/base" --seed 0
 score base
 run idea       --text-csv $IDEA
+fi
 
 if [[ " $PHASES " == *" t3 "* ]]; then
   run idea_syl        --text-csv $IDEA --syllable-speed
@@ -61,5 +63,14 @@ if [[ " $PHASES " == *" t4b "* ]]; then
   run fast10          --text-csv $IDEA --set nfe_step=10
   run fast12_sylE     --text-csv $IDEA --syllable-speed --syllable-scope english --set nfe_step=12
   run fast10_sylE     --text-csv $IDEA --syllable-speed --syllable-scope english --set nfe_step=10
+fi
+if [[ " $PHASES " == *" t2c "* ]]; then
+  # spelled abbreviations with commas between the letters, on the 8 hard items, seeds 0-2
+  HD="$OUT/hard_items.csv"
+  python -c "import csv;r=list(csv.DictReader(open('$VAL',encoding='utf-8')));w=csv.DictWriter(open('$HD','w',encoding='utf-8',newline=''),fieldnames=list(r[0]));w.writeheader();w.writerows(x for x in r if x['category']=='hard')"
+  for S in 0 1 2; do
+    ITEMS=$HD SEED=$S run s${S}hd_idea  --text-csv $IDEA
+    ITEMS=$HD SEED=$S run s${S}hd_abbr  --text-csv code/texts/idea_abbrcomma.csv
+  done
 fi
 python code/analysis/compare.py --res "$RES" --ref idea --base base

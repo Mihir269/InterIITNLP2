@@ -57,5 +57,6 @@ fi
 # run_baseline.py writes <folder>_timing.json next to each folder; keep predictions/ to audio + csvs
 mv -f "$PRED"/*_timing.json "$RES"/ 2>/dev/null || true
 
+python code/check_outputs.py --kit "$KIT" || echo "WARNING: some outputs fail the sanity checks (see above)"
 python code/fill_results.py --sub "$SUB"
 echo "Done. Next: python code/make_zip.py --roll <ROLLNO> && python $KIT/check_format.py <ROLLNO>_tts_bootcamp.zip"

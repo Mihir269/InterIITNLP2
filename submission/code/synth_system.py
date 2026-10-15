@@ -22,7 +22,7 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE / "frontend"))
-from syllables import speed_for  # noqa: E402
+from syllables import chars, speed_for  # noqa: E402
 
 
 def has_english(text):
@@ -55,6 +55,7 @@ def main():
     ap.add_argument("--syllable-speed", action="store_true")
     ap.add_argument("--syllable-scope", choices=["all", "english"], default="all")
     ap.add_argument("--ids", help="comma-separated subset of item ids")
+    ap.add_argument("--min-rate", type=float, default=5.0, help="chars/s floor when slowing an item down")
     ap.add_argument("--keep-pace", action="store_true")
     ap.add_argument("--speed-range", default="0.8,1.25")
     ap.add_argument("--seed", type=int, default=0)
@@ -85,7 +86,13 @@ def main():
         p = prompts[it["prompt_id"]]
         sp = base.get("speed", 1.0)
         if a.syllable_speed and (a.syllable_scope == "all" or has_english(it["orig_text"])):
-            sp *= speed_for(it["text"], p["transcript"], lo, hi)
+            f = speed_for(it["text"], p["transcript"], lo, hi)
+            if f < 1.0:
+                # never slow an item below --min-rate chars/s (the scorer fails items under 4 chars/s);
+                # IndicF5's own length is clip_seconds * chars(text) / chars(transcript)
+                dur = float(orig[it["prompt_id"]]["duration_s"]) * chars(it["text"]) / chars(p["transcript"])
+                f = max(f, min(1.0, dur * a.min_rate / max(1, chars(it["text"]))))
+            sp *= f
         if a.keep_pace:
             sp *= float(p["duration_s"]) / float(orig[it["prompt_id"]]["duration_s"])
         return {**base, "speed": round(sp, 4)}

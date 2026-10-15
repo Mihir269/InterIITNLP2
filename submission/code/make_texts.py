@@ -12,9 +12,24 @@ sys.path.insert(0, str(HERE / "frontend"))
 from normalize import normalize  # noqa: E402
 from translit import translit_text  # noqa: E402
 
+import normalize as _norm  # noqa: E402
+
+
+def _with_sep(sep, fn):
+    def run(t):
+        old, _norm.ABBR_SEP = _norm.ABBR_SEP, sep
+        try:
+            return fn(t)
+        finally:
+            _norm.ABBR_SEP = old
+    return run
+
+
 SYSTEMS = {
     "t2": normalize,
     "idea": lambda t: translit_text(normalize(t)),
+    # experiment: spelled abbreviations with commas between letters (ए, टी, एम)
+    "idea_abbrcomma": _with_sep(", ", lambda t: translit_text(normalize(t))),
 }
 
 

@@ -70,8 +70,11 @@ def decimal_words(int_part: str, frac: str) -> str:
     return f"{num_words(int(int_part))} दशमलव {digits_words(frac)}"
 
 
+ABBR_SEP = " "   # separator between spelled letters; ", " makes the model pause between them
+
+
 def spell_abbrev(tok: str) -> str:
-    return " ".join(LETTERS[c] for c in tok)
+    return ABBR_SEP.join(LETTERS[c] for c in tok)
 
 
 def read_abbrev(tok: str) -> str:
